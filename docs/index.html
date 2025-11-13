@@ -1,14 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>VAR A2 SEC LV</title>
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <style>
-      body { margin: 0; }
-    </style>
-    <script type="module" crossorigin src="/VAR_MIRI_Assignment_2/assets/index-DYxYQzSK.js"></script>
-  </head>
-  <body>
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <title>VAR A2 SEC LV</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+    }
+  </style>
+  <script type="module" crossorigin src="/VAR_MIRI_Assignment_2/assets/index-HGzWU_y0.js"></script>
+</head>
+
+<body>
+  <div id="info">
+    CAVE Simulator. The head and teapot are draggable. <br />
+    "L" See from Left Eye | "R" See from Right Eye | "S" toggle show scene <br />
+  </div>
+</body>
+
+
+<style>
+  body {
+    margin: 0;
+    background-color: #000;
+    color: #fff;
+    font-family: Monospace;
+    font-size: 13px;
+    line-height: 24px;
+  }
+
+  a {
+    color: #ff0;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  button {
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  #info {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    text-align: center;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    z-index: 1;
+    /* TODO Solve this in HTML */
+  }
+
+  a,
+  button,
+  input,
+  select {
+    pointer-events: auto;
+  }
+
+  .dg.ac {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    z-index: 2 !important;
+    /* TODO Solve this in HTML */
+  }
+</style>
+
 </html>
