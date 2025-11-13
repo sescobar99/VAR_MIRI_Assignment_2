@@ -20,7 +20,7 @@ export class DisplaySurface {
         this.origin = origin;
         this.u = u_vector;
         this.v = v_vector;
-        this.normal = (this.u.cross(this.v.normalize())).normalize();
+        // this.normal = (this.u.cross(this.v.normalize())).normalize();
         // console.log(this.name)
         // console.log(this.normal)
     }
@@ -32,28 +32,26 @@ export class DisplaySurface {
      * @param {THREE.Vector3} eye - The eye position in world coordinates.
      * @returns {THREE.Matrix4} The view matrix.
      */
-
-
     viewMatrix(eye) {
 
         // let normal = this.u.normalize().cross(this.v.normalize())
         // let target = normal
         // console.log(normal)
-        
+
         // let target = eye.projectOnPlane(this.normal)
-        console.log(target)
+        // console.log(target)
         // eye.mi
         // this.nor
-        var target = new THREE.Vector3(0, 0, -1);
+        var target = new THREE.Vector3(0, 0, 0);
         // const upVector = this.name == "Floor" ? this.upVectorFloor :this.upVectorRegular;
         // const upVector = this.upVectorFloor;
-        const upVector = this.upVectorRegular;
+        var upVector = new THREE.Vector3(0,1,0);	
         // console.log(upVector)
         var mat = new THREE.Matrix4();
         mat = mat.lookAt(eye, target, upVector); // this lookAt version creates only a rotation matrix
         var translate = new THREE.Matrix4().makeTranslation(-eye.x, -eye.y, -eye.z);
         mat = mat.multiplyMatrices(mat, translate);
-        mat
+
         return mat;
     }
 
