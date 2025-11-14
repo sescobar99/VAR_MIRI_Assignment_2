@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-
+// import { printMatrix4 } from './utils/print.js';
 
 // WIP: Santiago
 
@@ -20,39 +20,44 @@ export class DisplaySurface {
         this.origin = origin;
         this.u = u_vector;
         this.v = v_vector;
-        // this.normal = (this.u.cross(this.v.normalize())).normalize();
-        // console.log(this.name)
-        // console.log(this.normal)
+        this.u_hat = this.u.clone().normalize();
+        this.v_hat = this.v.clone().normalize();
+
+        // Workaround for Old ThreeJS API
+        let normal_vector = (new THREE.Vector3().crossVectors(this.u, this.v)).normalize();
+        // console.log(this.name);
+        // console.log(normal_vector);
+        this.normal_vector = normal_vector.addScalar(0);
+        // console.log(this.normal_vector);
+        this.upVector = this.v.clone().normalize();
+
+
     }
 
-    // upVectorRegular = new THREE.Vector3(0, 1, 0)
-    // upVectorFloor = new THREE.Vector3(0, 0, -1)
     /**
      * Creates the View Matrix for a given eye position.
      * @param {THREE.Vector3} eye - The eye position in world coordinates.
      * @returns {THREE.Matrix4} The view matrix.
      */
     viewMatrix(eye) {
+        // const target = eye.clone().projectOnPlane(this.normal_vector.clone())
+        // Project eye onto the display
+        // - Vector from a point in the plane to eye. 
+        // const vector = new THREE.Vector3().subVectors(eye.clone(), this.origin.clone());
+        // - Project vector onto the normal
+        // const vector_projection = this.normal_vector.clone().projectOnVector(vector.clone());
 
-        // let normal = this.u.normalize().cross(this.v.normalize())
-        // let target = normal
-        // console.log(normal)
-
-        // let target = eye.projectOnPlane(this.normal)
-        // console.log(target)
-        // eye.mi
-        // this.nor
-        var target = new THREE.Vector3(0, 0, 0);
-        // const upVector = this.name == "Floor" ? this.upVectorFloor :this.upVectorRegular;
-        // const upVector = this.upVectorFloor;
-        var upVector = new THREE.Vector3(0,1,0);	
-        // console.log(upVector)
-        var mat = new THREE.Matrix4();
-        mat = mat.lookAt(eye, target, upVector); // this lookAt version creates only a rotation matrix
-        var translate = new THREE.Matrix4().makeTranslation(-eye.x, -eye.y, -eye.z);
-        mat = mat.multiplyMatrices(mat, translate);
-
-        return mat;
+        // let rotation = new THREE.Matrix4();
+        // rotation = rotation.lookAt(eye, target, this.upVector); // this lookAt version creates only a rotation matrix
+        
+        const rotation = new THREE.Matrix4().set(
+            this.u_hat.x, this.v_hat.x, this.normal_vector.x, 0,
+            this.u_hat.y, this.v_hat.y, this.normal_vector.y, 0,
+            this.u_hat.z, this.v_hat.z, this.normal_vector.z, 0,
+            0, 0, 0, 1
+        );
+        const translate = new THREE.Matrix4().makeTranslation(-eye.x, -eye.y, -eye.z);
+        return new THREE.Matrix4().multiplyMatrices(rotation, translate);
     }
 
 

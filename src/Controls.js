@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
+import { printMatrix4 } from './utils/print.js';
 
 
 /**
@@ -92,19 +93,22 @@ export function setupKeyboardControls(camera, eyeScene, state, displaySurfaces) 
             case 'KeyT':
                 // Test view matrices
                 const viewF = displaySurfaces[0].viewMatrix(new THREE.Vector3(50, 20, 100));
-                // const viewL = displaySurfaces[1].viewMatrix(new THREE.Vector3(50, 20, 100));
-                // const viewR = displaySurfaces[2].viewMatrix(new THREE.Vector3(50, 20, 100));
-                // const viewB = displaySurfaces[3].viewMatrix(new THREE.Vector3(50, 20, 100));
+                const viewL = displaySurfaces[1].viewMatrix(new THREE.Vector3(50, 20, 100));
+                const viewR = displaySurfaces[2].viewMatrix(new THREE.Vector3(50, 20, 100));
+                const viewFloor = displaySurfaces[3].viewMatrix(new THREE.Vector3(50, 20, 100));
 
                 console.log("View matrices:");
-                console.log("Front:");
-                console.log(viewF);
-                // console.log("Left:");
+                printMatrix4(viewF);
+                // console.log(viewF);
+                printMatrix4(viewL);
                 // console.log(viewL);
-                // console.log("Right:");
+                printMatrix4(viewR);
                 // console.log(viewR);
-                // console.log("Bottom:");
-                // console.log(viewB);
+                printMatrix4(viewFloor);
+                // console.log(viewFloor);
+
+
+                console.log(displaySurfaces);
                 break;
         }
     });
