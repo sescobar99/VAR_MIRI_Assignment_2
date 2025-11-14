@@ -1,10 +1,10 @@
-export function printMatrix4(matrix, label="Matrix") {
-    const fixed_n = 0
+export function printMatrix4(matrix, label = "Matrix", decimal_digits = 0) {
+
     const e = matrix.elements;
     console.log(`${label}:\n` +
-        `${e[0].toFixed(fixed_n)} ${e[4].toFixed(fixed_n)} ${e[8].toFixed(fixed_n)} ${e[12].toFixed(fixed_n)}\n` +
-        `${e[1].toFixed(fixed_n)} ${e[5].toFixed(fixed_n)} ${e[9].toFixed(fixed_n)} ${e[13].toFixed(fixed_n)}\n` +
-        `${e[2].toFixed(fixed_n)} ${e[6].toFixed(fixed_n)} ${e[10].toFixed(fixed_n)} ${e[14].toFixed(fixed_n)}\n` +
-        `${e[3].toFixed(fixed_n)} ${e[7].toFixed(fixed_n)} ${e[11].toFixed(fixed_n)} ${e[15].toFixed(fixed_n)}`
+        `${e[0].toFixed(decimal_digits)} ${e[4].toFixed(decimal_digits)} ${e[8].toFixed(decimal_digits)} ${e[12].toFixed(decimal_digits)}\n` +
+        `${e[1].toFixed(decimal_digits)} ${e[5].toFixed(decimal_digits)} ${e[9].toFixed(decimal_digits)} ${e[13].toFixed(decimal_digits)}\n` +
+        `${e[2].toFixed(decimal_digits)} ${e[6].toFixed(decimal_digits)} ${e[10].toFixed(decimal_digits)} ${e[14].toFixed(decimal_digits)}\n` +
+        `${e[3].toFixed(decimal_digits)} ${e[7].toFixed(decimal_digits)} ${e[11].toFixed(decimal_digits)} ${e[15].toFixed(decimal_digits)}`
     );
 }

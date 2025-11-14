@@ -98,17 +98,31 @@ export function setupKeyboardControls(camera, eyeScene, state, displaySurfaces) 
                 const viewFloor = displaySurfaces[3].viewMatrix(new THREE.Vector3(50, 20, 100));
 
                 console.log("View matrices:");
-                printMatrix4(viewF);
+                printMatrix4(viewF, "Front");
                 // console.log(viewF);
-                printMatrix4(viewL);
+                printMatrix4(viewL, "Left");
                 // console.log(viewL);
-                printMatrix4(viewR);
+                printMatrix4(viewR, "Right");
                 // console.log(viewR);
-                printMatrix4(viewFloor);
+                printMatrix4(viewFloor, "Floor");
                 // console.log(viewFloor);
-
-
                 console.log(displaySurfaces);
+                // break;
+
+                // Test projection transform 
+                const debug_eye = new THREE.Vector3(50, 20, 100);
+                const debug_znear = 0.1;
+                const debug_zfar = 100;
+                const transformF = displaySurfaces[0].projectionMatrix(debug_eye, debug_znear, debug_zfar);
+                const transformL = displaySurfaces[1].projectionMatrix(debug_eye, debug_znear, debug_zfar);
+                const transformR = displaySurfaces[2].projectionMatrix(debug_eye, debug_znear, debug_zfar);
+                const transformFloor = displaySurfaces[3].projectionMatrix(debug_eye, debug_znear, debug_zfar);
+                console.log("Transform matrices:");
+                printMatrix4(transformF, "Front", 4);
+                printMatrix4(transformL, "Left", 4);
+                printMatrix4(transformR, "Right", 4);
+                printMatrix4(transformFloor, "Floor", 4);
+
                 break;
         }
     });

@@ -49,7 +49,7 @@ export class DisplaySurface {
 
         // let rotation = new THREE.Matrix4();
         // rotation = rotation.lookAt(eye, target, this.upVector); // this lookAt version creates only a rotation matrix
-        
+
         const rotation = new THREE.Matrix4().set(
             this.u_hat.x, this.v_hat.x, this.normal_vector.x, 0,
             this.u_hat.y, this.v_hat.y, this.normal_vector.y, 0,
@@ -71,10 +71,30 @@ export class DisplaySurface {
     projectionMatrix(eye, znear, zfar) {
         // to be written by you!
 
-        var left = -1;
-        var right = 1;
-        var bottom = -1;
-        var top = 1;
+        // Screen geometry:
+        const p0 = this.origin.clone();     // screen bottom-left corner
+        const u = this.u.clone();          // horizontal screen vector
+        const v = this.v.clone();          // vertical screen vector
+        const n = this.normal_vector.clone();     // normalized screen normal
+        const u_hat = this.u_hat.clone();   // normalized u
+        const v_hat = this.v_hat.clone();   // normalized v
+
+
+        // Vectors from the eye to the screen corners
+        const eyeToP0 = p0.clone().sub(eye);
+        const eyeToP1 = p0.clone().add(u).sub(eye);
+        const eyeToP2 = p0.clone().add(v).sub(eye);
+
+        // Distance from eye to plane along the plane normal
+        const d = -eyeToP0.dot(n);   // must be positive (eye in front of screen)
+        const nearOverD = znear / d;
+
+        // Compute left/right/top/bottom on the near plane
+        const left = u_hat.dot(eyeToP0) * nearOverD;
+        const right = u_hat.dot(eyeToP1) * nearOverD;
+        const bottom = v_hat.dot(eyeToP0) * nearOverD;
+        const top = v_hat.dot(eyeToP2) * nearOverD;
+
         return new THREE.Matrix4().makePerspective(left, right, top, bottom, znear, zfar);
     }
 }
