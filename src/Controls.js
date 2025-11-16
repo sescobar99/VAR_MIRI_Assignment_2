@@ -40,18 +40,14 @@ export function enableOrbitCamera(camera, renderer) {
 
 /**
  * Adds drag controls to the teapot and head objects.
- * @param {THREE.Scene} scene - The main scene.
- * @param {THREE.Scene} eyeScene - The head/eye scene.
  * @param {THREE.Camera} camera - The main camera.
  * @param {THREE.Renderer} renderer - The main renderer.
  * @param {OrbitControls} orbitControl - The orbit controls instance to disable/enable.
+ * @param {Array} draggableObjects - The array of draggable objects.
  */
-export function addDragControlToObjects(scene, eyeScene, camera, renderer, orbitControl) {
-    const objects = [];
-    objects.push(scene.getObjectByName("Teapot"));
-    objects.push(eyeScene.getObjectByName("Head"));
-
-    const controls = new DragControls(objects, camera, renderer.domElement);
+export function addDragControlToObjects(camera, renderer, orbitControl, draggableObjects) {
+    console.log(draggableObjects);
+    const controls = new DragControls(draggableObjects, camera, renderer.domElement);
 
     // --- Define Named Functions for Drag Control ---
     // We define these as named functions so we can explicitly remove/re-add them later.
@@ -69,6 +65,38 @@ export function addDragControlToObjects(scene, eyeScene, camera, renderer, orbit
     controls.addEventListener('dragstart', onDragStart);
     controls.addEventListener('dragend', onDragEnd);
 
+
+    // --- WebXR Safety Management ---
+    // Function to run when entering the VR session
+    renderer.xr.addEventListener('sessionstart', function () {
+        // 1. Disable OrbitControls (XR takes over camera)
+        orbitControl.enabled = false;
+
+        // 2. Remove DragControls listeners to prevent them from firing in VR 
+        controls.removeEventListener('dragstart', onDragStart);
+        controls.removeEventListener('dragend', onDragEnd);
+
+        // 3. Disable the DragControls entirely
+        controls.enabled = false
+
+
+        // 4. Start VR Interaction System here
+    });
+
+    // Function to run when exiting the VR session
+    renderer.xr.addEventListener('sessionend', function () {
+        // 1. Re-enable OrbitControls for desktop/mobile spectator view
+        orbitControl.enabled = true;
+
+        // 2. Re-attach DragControls listeners
+        controls.addEventListener('dragstart', onDragStart);
+        controls.addEventListener('dragend', onDragEnd);
+
+        // 3. CRITICAL: Re-enable the DragControls
+        controls.enabled = true;
+
+        // 4. Stop VR Interaction System here
+    });
 }
 
 /**
