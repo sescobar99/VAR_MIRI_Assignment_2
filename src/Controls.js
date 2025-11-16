@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 import { printMatrix4 } from './utils/print.js';
+import { SCALING_FACTOR } from './Constants';
 
 
 /**
@@ -32,8 +33,8 @@ export function getRightEyePosition(eyeScene) {
  */
 export function enableOrbitCamera(camera, renderer) {
     const orbitControl = new OrbitControls(camera, renderer.domElement);
-    orbitControl.minDistance = 120;
-    orbitControl.maxDistance = 50000;
+    orbitControl.minDistance = 120 * SCALING_FACTOR;
+    orbitControl.maxDistance = 50000 * SCALING_FACTOR;
     return orbitControl;
 }
 
@@ -52,18 +53,22 @@ export function addDragControlToObjects(scene, eyeScene, camera, renderer, orbit
 
     const controls = new DragControls(objects, camera, renderer.domElement);
 
-    controls.addEventListener('hoveron', function (event) {
+    // --- Define Named Functions for Drag Control ---
+    // We define these as named functions so we can explicitly remove/re-add them later.
+    function onDragStart(event) {
         orbitControl.enabled = false;
-    });
-    controls.addEventListener('hoveroff', function (event) {
-        orbitControl.enabled = true;
-    });
-    controls.addEventListener('dragstart', function (event) {
         event.object.material.emissive.set(0xaaaaaa);
-    });
-    controls.addEventListener('dragend', function (event) {
+    }
+
+    function onDragEnd(event) {
+        orbitControl.enabled = true;
         event.object.material.emissive.set(0x000000);
-    });
+    }
+
+    // Attach initial listeners for desktop/mobile use
+    controls.addEventListener('dragstart', onDragStart);
+    controls.addEventListener('dragend', onDragEnd);
+
 }
 
 /**

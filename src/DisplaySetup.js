@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { DisplaySurface } from './DisplaySurface';
 import { createLights } from './SceneSetup';
+import { SCALING_FACTOR } from './Constants';
 
 // Used internally by createDisplaySurfaceTargets()
 const TEXTURE_SIZE = 1024; // texture resolution
@@ -14,16 +15,16 @@ export function createDisplaySurfaces() {
     const displaySurfaces = [];
     // FRONT SCREEN
     const frontScreen = new DisplaySurface("Front",
-        new THREE.Vector3(-150.0, -150.0, -150.0),
-        new THREE.Vector3(300.0, 0.0, 0.0),
-        new THREE.Vector3(0.0, 300.0, 0.0));
+        new THREE.Vector3(-150.0 * SCALING_FACTOR, -150.0 * SCALING_FACTOR, -150.0 * SCALING_FACTOR),
+        new THREE.Vector3(300.0 * SCALING_FACTOR, 0.0 * SCALING_FACTOR, 0.0 * SCALING_FACTOR),
+        new THREE.Vector3(0.0 * SCALING_FACTOR, 300.0 * SCALING_FACTOR, 0.0 * SCALING_FACTOR));
     displaySurfaces.push(frontScreen);
 
     // LEFT SCREEN
     const leftScreen = new DisplaySurface("Left",
-        new THREE.Vector3(-150.0, -150.0, 150.0),
-        new THREE.Vector3(0.0, 0.0, -300.0),
-        new THREE.Vector3(0.0, 300.0, 0.0));
+        new THREE.Vector3(-150.0 * SCALING_FACTOR, -150.0 * SCALING_FACTOR, 150.0 * SCALING_FACTOR),
+        new THREE.Vector3(0.0 * SCALING_FACTOR, 0.0 * SCALING_FACTOR, -300.0 * SCALING_FACTOR),
+        new THREE.Vector3(0.0 * SCALING_FACTOR, 300.0 * SCALING_FACTOR, 0.0 * SCALING_FACTOR));
     displaySurfaces.push(leftScreen);
 
     // to be completed by you (Right, Floor, etc.)
@@ -31,16 +32,16 @@ export function createDisplaySurfaces() {
 
     // RIGHT SCREEN
     const rightScreen = new DisplaySurface("Right",
-        new THREE.Vector3(150.0, -150.0, -150.0),
-        new THREE.Vector3(0.0, 0.0, 300.0),
-        new THREE.Vector3(0.0, 300.0, 0.0));
+        new THREE.Vector3(150.0 * SCALING_FACTOR, -150.0 * SCALING_FACTOR, -150.0 * SCALING_FACTOR),
+        new THREE.Vector3(0.0 * SCALING_FACTOR, 0.0 * SCALING_FACTOR, 300.0 * SCALING_FACTOR),
+        new THREE.Vector3(0.0 * SCALING_FACTOR, 300.0 * SCALING_FACTOR, 0.0 * SCALING_FACTOR));
     displaySurfaces.push(rightScreen);
 
     // FLOOR SCREEN
     var floorScreen = new DisplaySurface("Floor",
-        new THREE.Vector3(-150.0, -150.0, 150.0),
-        new THREE.Vector3(300.0, 0.0, 0.0),
-        new THREE.Vector3(0.0, 0.0, -300.0));
+        new THREE.Vector3(-150.0 * SCALING_FACTOR, -150.0 * SCALING_FACTOR, 150.0 * SCALING_FACTOR),
+        new THREE.Vector3(300.0 * SCALING_FACTOR, 0.0 * SCALING_FACTOR, 0.0 * SCALING_FACTOR),
+        new THREE.Vector3(0.0 * SCALING_FACTOR, 0.0 * SCALING_FACTOR, -300.0 * SCALING_FACTOR));
     displaySurfaces.push(floorScreen);
 
 
@@ -74,7 +75,7 @@ export function createDisplaySurfaceScene(displaySurfaces, displaySurfaceTargets
         const u = displaySurface.u;
         const v = displaySurface.v;
 
-        const geometry = new THREE.BoxGeometry(u.length(), v.length(), 0.01);
+        const geometry = new THREE.BoxGeometry(u.length(), v.length(), 0.01*SCALING_FACTOR);
         const material = new THREE.MeshPhongMaterial({ map: displaySurfaceTargets[index].texture });
         const cube = new THREE.Mesh(geometry, material);
         cube.name = displaySurface.name;
