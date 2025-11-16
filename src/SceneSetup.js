@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { TeapotGeometry } from "three/examples/jsm/geometries/TeapotGeometry.js"
+import { SCALING_FACTOR } from './Constants';
 /**
  * Creates and adds ambient and point lights to a scene.
  * @param {THREE.Scene} scn - The scene to add lights to.
@@ -12,7 +13,7 @@ export function createLights(scn) {
 
     // Point light intensity is 0.8
     const pointLight = new THREE.PointLight(0xffffff, 0.8);
-    pointLight.position.z += 200;
+    pointLight.position.z += 200 * SCALING_FACTOR;
     scn.add(pointLight);
 }
 
@@ -23,11 +24,11 @@ export function createLights(scn) {
 export function createScene() {
     const scene = new THREE.Scene();
 
-    const geometry = new TeapotGeometry(40, 15);
+    const geometry = new TeapotGeometry(40 * SCALING_FACTOR, 15 );
     const material = new THREE.MeshPhongMaterial({ color: 0xffffff });
     const teapot = new THREE.Mesh(geometry, material);
     teapot.name = "Teapot";
-    teapot.position.z -= 70;
+    teapot.position.z -= 70 * SCALING_FACTOR;
     scene.add(teapot);
 
     createLights(scene);
@@ -40,16 +41,16 @@ export function createScene() {
  * @returns {{eyeScene: THREE.Scene, eyeCenter: THREE.Vector3}} The eye scene and the center position.
  */
 export function createEyeScene() {
-    const IPD = 6.8;
-    const eyeCenter = new THREE.Vector3(50, 20, 50);
+    const IPD = 6.8 * SCALING_FACTOR;
+    const eyeCenter = new THREE.Vector3(50 * SCALING_FACTOR, 20 * SCALING_FACTOR, 50 * SCALING_FACTOR);
     // eye positions relative to the head
-    const eyeL = new THREE.Vector3(-IPD / 2, 10, -6);
-    const eyeR = new THREE.Vector3(+IPD / 2, 10, -6);
+    const eyeL = new THREE.Vector3(-IPD / 2, 10 * SCALING_FACTOR, -6 * SCALING_FACTOR);
+    const eyeR = new THREE.Vector3(+IPD / 2, 10 * SCALING_FACTOR, -6 * SCALING_FACTOR);
 
     let eyeScene = new THREE.Scene();
 
     // add sphere representing head
-    let geometry = new THREE.SphereGeometry(10, 32, 22);
+    let geometry = new THREE.SphereGeometry(10 * SCALING_FACTOR, 32, 22);
     let material = new THREE.MeshPhongMaterial({ color: 0xaaaaaa });
     const head = new THREE.Mesh(geometry, material);
     head.name = "Head";
@@ -57,14 +58,14 @@ export function createEyeScene() {
     eyeScene.add(head);
 
     // add spheres representing L/R eyes
-    geometry = new THREE.SphereGeometry(3, 32, 22);
+    geometry = new THREE.SphereGeometry(3 * SCALING_FACTOR, 32, 22);
     material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
     let sphere = new THREE.Mesh(geometry, material);
     sphere.name = "EyeL";
     sphere.position.set(eyeL.x, eyeL.y, eyeL.z);
     head.add(sphere);
 
-    geometry = new THREE.SphereGeometry(3, 32, 22);
+    geometry = new THREE.SphereGeometry(3 * SCALING_FACTOR, 32, 22);
     material = new THREE.MeshPhongMaterial({ color: 0x0000ff });
     sphere = new THREE.Mesh(geometry, material);
     sphere.name = "EyeR";
