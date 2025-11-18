@@ -6,6 +6,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 const tempPlane = new THREE.Plane();
 const tempPoint = new THREE.Vector3();
 const v_intersect = new THREE.Vector3();
+import { SCALING_FACTOR } from './Constants';
+
 // Global state and Three.js objects
 let renderer, scene, camera;
 let displaySurfaces, displaySurfaceScene, displaySurfaceTargets;
@@ -27,7 +29,7 @@ function cameraFromViewProj(view, proj) {
 }
 
 /**
- * Initializes the WebGLRenderer.
+ * Initialize the Renderer.
  */
 function createRenderer() {
     renderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
@@ -41,7 +43,7 @@ function createRenderer() {
  */
 function createCamera() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-    camera.position.set(100, 100, 300);
+    camera.position.set(100 * SCALING_FACTOR, 100 * SCALING_FACTOR, 300 * SCALING_FACTOR);
     camera.lookAt(0, 0, 0);
 }
 
@@ -66,7 +68,7 @@ const animate = function () {
         gl.colorMask(1, 0, 0, 0);
         const eyeL = getLeftEyePosition(eyeScene);
         const viewL = displaySurface.viewMatrix(eyeL);
-        const projL = displaySurface.projectionMatrix(eyeL, 1, 10000);
+        const projL = displaySurface.projectionMatrix(eyeL, 1 * SCALING_FACTOR, 10000 * SCALING_FACTOR);
         const leftCamera = cameraFromViewProj(viewL, projL);
         renderer.render(scene, leftCamera);
 
@@ -74,7 +76,7 @@ const animate = function () {
         gl.colorMask(0, 1, 1, 0);
         const eyeR = getRightEyePosition(eyeScene);
         const viewR = displaySurface.viewMatrix(eyeR);
-        const projR = displaySurface.projectionMatrix(eyeR, 1, 10000);
+        const projR = displaySurface.projectionMatrix(eyeR, 1 * SCALING_FACTOR, 10000 * SCALING_FACTOR);
         const rightCamera = cameraFromViewProj(viewR, projR);
         renderer.clearDepth();
         renderer.render(scene, rightCamera);
@@ -150,9 +152,10 @@ function init() {
     orbitControl = enableOrbitCamera(camera, renderer);
     addDragControlToObjects(scene, eyeScene, camera, renderer, orbitControl);
 
-    // Pass state variable by reference (or just let it be scoped globally/in the main module)
+    // Black magic to deliver the state
     setupKeyboardControls(camera, eyeScene, { get showScene() { return showScene; }, set showScene(val) { showScene = val; } }, displaySurfaces);
 
+    // Change to allow VR
     animate();
 }
 
