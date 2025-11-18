@@ -30,8 +30,15 @@ export function createScene() {
     teapot.position.z -= 70;
     scene.add(teapot);
 
+    const torusGeometry = new THREE.TorusGeometry(30, 10, 16, 100); 
+    const torus = new THREE.Mesh(torusGeometry, material.clone()); 
+    torus.name = "Torus";
+    torus.position.set(120, -30, -100); 
+    torus.material.color.set(0xFFE4C4); 
+    torus.rotation.x = Math.PI / 2;
+    scene.add(torus);
     createLights(scene);
-
+   
     return scene;
 }
 
@@ -71,6 +78,23 @@ export function createEyeScene() {
     sphere.position.set(eyeR.x, eyeR.y, eyeR.z);
     head.add(sphere);
 
+    // Create parallax lines
+    const lineMaterialL = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    const lineMaterialR = new THREE.LineBasicMaterial({ color: 0x0000ff });
+
+    // Create dummy geometry to start (will be updated in animate)
+    const points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0)];
+    const lineGeoL = new THREE.BufferGeometry().setFromPoints(points);
+    const lineGeoR = new THREE.BufferGeometry().setFromPoints(points);
+
+    const gazeLineL = new THREE.Line(lineGeoL, lineMaterialL);
+    gazeLineL.name = "LineL";
+    const gazeLineR = new THREE.Line(lineGeoR, lineMaterialR);
+    gazeLineR.name = "LineR";
+
+    eyeScene.add(gazeLineL);
+    eyeScene.add(gazeLineR);
+    // ----
     createLights(eyeScene);
 
     return { eyeScene, eyeCenter };

@@ -2,14 +2,18 @@ import * as THREE from 'three';
 import { createDisplaySurfaces, createDisplaySurfaceTargets, createDisplaySurfaceScene } from './DisplaySetup';
 import { createScene, createEyeScene } from './SceneSetup';
 import { enableOrbitCamera, addDragControlToObjects, setupKeyboardControls, getLeftEyePosition, getRightEyePosition } from './Controls';
-
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+const tempPlane = new THREE.Plane();
+const tempPoint = new THREE.Vector3();
+const v_intersect = new THREE.Vector3();
 // Global state and Three.js objects
 let renderer, scene, camera;
 let displaySurfaces, displaySurfaceScene, displaySurfaceTargets;
 let eyeScene;
 let orbitControl;
 let showScene = true;
-
+let gazeLineL, gazeLineR; 
+let teapotGeometry; 
 // Helper function to create the camera used for texture rendering
 function cameraFromViewProj(view, proj) {
     const cam = camera.clone();
@@ -84,6 +88,27 @@ const animate = function () {
     // 3. render display surfaces as (textured) quads
     renderer.render(displaySurfaceScene, camera);
 
+    // Update parallax lines
+
+    if (teapotGeometry && gazeLineL && gazeLineR) {
+        // Get current positions
+        const eyeLPos = getLeftEyePosition(eyeScene);
+        const eyeRPos = getRightEyePosition(eyeScene);
+        const teapotPos = teapotGeometry.getWorldPosition(new THREE.Vector3());
+        const rayL = new THREE.Ray(eyeLPos, new THREE.Vector3().subVectors(teapotPos, eyeLPos).normalize());
+        const rayR = new THREE.Ray(eyeRPos, new THREE.Vector3().subVectors(teapotPos, eyeRPos).normalize());
+        const endPointL = findClosestHit(rayL, displaySurfaces);
+        const endPointR = findClosestHit(rayR, displaySurfaces);
+
+        // Update the line geometries to go from eye to wall
+        gazeLineL.geometry.setFromPoints([eyeLPos, endPointL]);
+        gazeLineR.geometry.setFromPoints([eyeRPos, endPointR]);
+
+        // Tell three.js the geometry has changed
+        gazeLineL.geometry.computeBoundingSphere();
+        gazeLineR.geometry.computeBoundingSphere();
+    }
+
     // 4. render eyes
     renderer.render(eyeScene, camera);
 
@@ -107,6 +132,21 @@ function init() {
 
     scene = createScene();
 
+    // Load a GLTF/GLB model from the models/ folder
+    const loader = new GLTFLoader();
+    loader.load('./models/cake_anime_model_1.glb', (gltf) => {
+        const model = gltf.scene;
+        model.name = "cake";
+        model.position.set(-80, -30, -80); 
+        model.scale.set(20,20,20); 
+        scene.add(model);
+    }, undefined, (err) => {
+        console.error('Model load error:', err);
+    });
+
+    gazeLineL = eyeScene.getObjectByName("LineL");
+    gazeLineR = eyeScene.getObjectByName("LineR");
+    teapotGeometry = scene.getObjectByName("Teapot");
     orbitControl = enableOrbitCamera(camera, renderer);
     addDragControlToObjects(scene, eyeScene, camera, renderer, orbitControl);
 
@@ -124,4 +164,40 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+function findClosestHit(ray, surfaces) {
+    let max_t = -Infinity;
+    let hitPoint = null;
+
+    for (const surface of surfaces) {
+        tempPlane.setFromNormalAndCoplanarPoint(surface.normal_vector, surface.origin);
+        const t = ray.distanceToPlane(tempPlane);
+
+        // Only consider hits in front of the ray (t > 0)
+        if (t > 0 && t !== null && Number.isFinite(t)) {
+            ray.at(t, tempPoint);
+
+            // Check bounds
+            v_intersect.subVectors(tempPoint, surface.origin);
+            const proj_u = v_intersect.dot(surface.u_hat);
+            const proj_v = v_intersect.dot(surface.v_hat);
+            if (proj_u >= 0 && proj_v >= 0 && proj_u <= surface.u.length() && proj_v <= surface.v.length()) 
+            {
+                if (t > max_t) {
+                    max_t = t;
+                    hitPoint = tempPoint.clone();
+                }
+            }
+        }
+    }
+
+    if (hitPoint) {
+        // hit
+        const epsilon = 200;
+        return ray.at(max_t + epsilon, new THREE.Vector3());
+        //return hitPoint;
+    } else {
+        return ray.at(10000, new THREE.Vector3());
+    }
+}
 
