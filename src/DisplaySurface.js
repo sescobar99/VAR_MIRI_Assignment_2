@@ -40,22 +40,30 @@ export class DisplaySurface {
      * @returns {THREE.Matrix4} The view matrix.
      */
     viewMatrix(eye) {
+        // First approach using lookAt. It did not  work properly
         // const target = eye.clone().projectOnPlane(this.normal_vector.clone())
         // Project eye onto the display
         // - Vector from a point in the plane to eye. 
         // const vector = new THREE.Vector3().subVectors(eye.clone(), this.origin.clone());
         // - Project vector onto the normal
         // const vector_projection = this.normal_vector.clone().projectOnVector(vector.clone());
-
         // let rotation = new THREE.Matrix4();
         // rotation = rotation.lookAt(eye, target, this.upVector); // this lookAt version creates only a rotation matrix
 
+        // Second approach using rotation matrix
         const rotation = new THREE.Matrix4().set(
             this.u_hat.x, this.v_hat.x, this.normal_vector.x, 0,
             this.u_hat.y, this.v_hat.y, this.normal_vector.y, 0,
             this.u_hat.z, this.v_hat.z, this.normal_vector.z, 0,
             0, 0, 0, 1
         );
+
+        // // Third approach trying lookAt again (It works)
+        // const d = Math.abs(eye.clone().dot(this.normal_vector) + (this.normal_vector.clone().dot(this.origin)));
+        // const target = eye.clone().sub(this.normal_vector.clone().multiplyScalar(d));
+        // let rotation = new THREE.Matrix4();
+        // rotation = rotation.lookAt(eye, target, this.upVector);
+
         const translate = new THREE.Matrix4().makeTranslation(-eye.x, -eye.y, -eye.z);
         return new THREE.Matrix4().multiplyMatrices(rotation, translate);
     }
