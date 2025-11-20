@@ -224,6 +224,16 @@ function init() {
         model.position.set(-80 * SCALING_FACTOR, -30 * SCALING_FACTOR, -80 * SCALING_FACTOR);
         model.scale.set(20 * SCALING_FACTOR, 20 * SCALING_FACTOR, 20 * SCALING_FACTOR);
         scene.add(model);
+        model.traverse( function( child ) {
+
+        child.castShadow = true;
+        child.receiveShadow = true;
+        //if (!child.name) child.name = 'cake_mesh';
++       draggableObjects.push(child);
+
+        } );
+     
+        
     }, undefined, (err) => {
         console.error('Model load error:', err);
     });

@@ -74,7 +74,38 @@ export function addDragControlToObjects(camera, renderer, orbitControl, draggabl
     // Attach initial listeners for desktop/mobile use
     controls.addEventListener('dragstart', onDragStart);
     controls.addEventListener('dragend', onDragEnd);
+controls.addEventListener('dragstart', function (event) {
+    const obj = event.object;
 
+    // ensure userData slot for restore
+    obj.userData._origMat = obj.userData._origMat || {};
+
+    const mat = obj.material;
+    if (!mat) return;
+
+    // store values to restore later
+    obj.userData._origMat.color = mat.color ? mat.color.clone() : null;
+    obj.userData._origMat.emissive = mat.emissive ? mat.emissive.clone() : null;
+    obj.userData._origMat.opacity = mat.opacity;
+
+    // highlight
+    if (mat.emissive !== undefined) mat.emissive.set(0x333333);
+    else if (mat.color !== undefined) mat.color.offsetHSL(0, 0, 0.15); // brighten slightly
+});
+
+controls.addEventListener('dragend', function (event) {
+    const obj = event.object;
+    const mat = obj.material;
+    if (!mat || !obj.userData._origMat) return;
+
+    // restore exactly what we saved
+    const orig = obj.userData._origMat;
+    if (orig.color && mat.color) mat.color.copy(orig.color);
+    if (orig.emissive && mat.emissive) mat.emissive.copy(orig.emissive);
+    mat.opacity = orig.opacity;
+
+    delete obj.userData._origMat;
+});
 
     // --- WebXR Safety Management ---
     // Function to run when entering the VR session
