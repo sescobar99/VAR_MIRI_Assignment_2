@@ -46,7 +46,17 @@ export function enableOrbitCamera(camera, renderer) {
  * @param {Array} draggableObjects - The array of draggable objects.
  */
 export function addDragControlToObjects(camera, renderer, orbitControl, draggableObjects) {
-    console.log(draggableObjects);
+    // ##### Old signature
+    // export function addDragControlToObjects(scene, eyeScene, camera, renderer, orbitControl) {
+    // ##### Old object acquirement
+    // const objects = [];
+    // objects.push(scene.getObjectByName("Teapot"));
+    // objects.push(eyeScene.getObjectByName("Head"));
+    // objects.push(scene.getObjectByName("Torus"));
+    // const cake = scene.getObjectByName("cake");
+    // if (cake) objects.push(cake);
+    // const controls = new DragControls(objects, camera, renderer.domElement);
+    // console.log(draggableObjects);
     const controls = new DragControls(draggableObjects, camera, renderer.domElement);
 
     // --- Define Named Functions for Drag Control ---
