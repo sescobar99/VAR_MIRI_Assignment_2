@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { createDisplaySurfaces, createDisplaySurfaceTargets, createDisplaySurfaceScene } from './DisplaySetup';
-import { createScene, createEyeScene } from './SceneSetup';
+import { createScene, createEyeScene, createLights } from './SceneSetup';
 import { enableOrbitCamera, addDragControlToObjects, setupKeyboardControls, getLeftEyePosition, getRightEyePosition } from './Controls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { SCALING_FACTOR } from './Constants';
@@ -21,13 +21,17 @@ let showScene = true;
 
 const draggableObjects = [];
 //  VR
+let vrActive = false;
+let VRScene;
 let controller1, controller2;
 let controllerGrip1, controllerGrip2;
 let raycaster;
-const raycasterReach = 70 * SCALING_FACTOR;
+const raycasterReach = 200 * SCALING_FACTOR;
 const intersected = [];
 const tempMatrix = new THREE.Matrix4();
-let controls, group;
+// The three js example used group for adding elements and then interacting with them
+let group;
+
 
 let gazeLineL, gazeLineR;
 let teapotGeometry;
@@ -63,7 +67,12 @@ function createRenderer() {
 }
 
 
-function createVR() {
+/**
+ * 
+ * @param { THREE.Scene } scene
+ * @param { THREE.WebGLRenderer } renderer
+*/
+function createVR(scene, renderer) {
     // controllers
     controller1 = renderer.xr.getController(0);
     controller1.addEventListener('selectstart', onSelectStart);
@@ -92,6 +101,8 @@ function createVR() {
     controller2.add(line.clone());
     raycaster = new THREE.Raycaster();
 
+    createLights(scene);
+
 }
 
 /**
@@ -107,14 +118,10 @@ function createCamera() {
 const animate = function () {
     const gl = renderer.getContext();
     // requestAnimationFrame(animate);
-    //  VR version 
-    // renderer.setAnimationLoop(animate);
-    // renderer.setAnimationLoop(function () {
-
-    //     renderer.render(scene, camera);
-
-    // });
-
+    //  VR 
+    if (vrActive) {
+        cleanIntersected();
+    }
     // 1. render scene objects
     renderer.setClearColor(0x808080);
     renderer.clear();
@@ -178,11 +185,15 @@ const animate = function () {
     renderer.render(eyeScene, camera);
 
 
-    // // VR
-    // cleanIntersected();
 
-    // intersectObjects(controller1);
-    // intersectObjects(controller2);
+
+    // VR
+    if (vrActive) {
+        renderer.render(VRScene, camera);
+        intersectObjects(controller1);
+        intersectObjects(controller2);
+
+    }
 };
 
 // --- Initialization Block ---
@@ -200,6 +211,10 @@ function init() {
     eyeScene = eyeSceneSetup.eyeScene;
 
     scene = createScene();
+    // group = new THREE.Group();
+    // scene.add(group);
+    // group.add(scene.getObjectByName("Teapot"));
+    // group.add(eyeScene.getObjectByName("Head"));
 
     // Load a GLTF/GLB model from the models/ folder
     const loader = new GLTFLoader();
@@ -223,10 +238,12 @@ function init() {
     draggableObjects.push(scene.getObjectByName("Teapot"));
     draggableObjects.push(eyeScene.getObjectByName("Head"));
     const cake = scene.getObjectByName("cake");
-    if (cake) objects.push(cake);
+    if (cake) draggableObjects.push(cake);
     // console.log(scene)
     addDragControlToObjects(camera, renderer, orbitControl, draggableObjects);
-    createVR();
+
+    VRScene = new THREE.Scene();
+    createVR(VRScene, renderer);
 
     // Black magic to deliver the state
     setupKeyboardControls(camera, eyeScene, { get showScene() { return showScene; }, set showScene(val) { showScene = val; } }, displaySurfaces);
@@ -247,7 +264,7 @@ window.addEventListener('resize', () => {
 
 
 
-// VR Functions
+// VR Functions WIP
 function onSelectStart(event) {
     const controller = event.target;
     const intersections = getIntersections(controller);
@@ -267,6 +284,7 @@ function onSelectEnd(event) {
         object.material.emissive.b = 0;
         group.attach(object);
         controller.userData.selected = undefined;
+        // Crashing on object drop
     }
 }
 
@@ -279,9 +297,18 @@ function getIntersections(controller) {
     raycaster.ray.direction.set(0, 0, - 1).applyMatrix4(tempMatrix);
     // Quede loco, en el ejemplo lo usan asi pero parece que raycaster ya viene con esto
     // y aun asi creamos nuestra propia func con el mismo nombre
-    return raycaster.intersectObjects(draggableObjects, false);
+    //  Taken from source code of three js: ...
+    // * Checks all intersection between the ray and the object with or without the descendants
+    //      * @remarks Intersections are returned sorted by distance, closest first
+    //      * @remarks {@link Raycaster} delegates to the {@link Object3D.raycast | raycast} method of the passed object, when evaluating whether the ray intersects the object or not
+    //  ...
+    // return raycaster.intersectObjects(draggableObjects, false);
+    // # TODO: revisar
+    return raycaster.intersectObjects(dsraggableObjects, false);
+    // return raycaster.intersectObjects(group.children, false);
 }
 
+// Different from raycaster.intersectObjects
 function intersectObjects(controller) {
     // Do not highlight when already selected
     if (controller.userData.selected !== undefined) return;
@@ -341,3 +368,7 @@ function findClosestHit(ray, surfaces) {
     }
 }
 
+
+renderer.xr.addEventListener('sessionstart', function () {
+    vrActive = true;
+});

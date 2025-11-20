@@ -95,7 +95,7 @@ export function addDragControlToObjects(camera, renderer, orbitControl, draggabl
 
     // Function to run when exiting the VR session
     renderer.xr.addEventListener('sessionend', function () {
-        // 1. Re-enable OrbitControls for desktop/mobile spectator view
+        // 1. Re-enable OrbitControls for desktop/mobile view
         orbitControl.enabled = true;
 
         // 2. Re-attach DragControls listeners
