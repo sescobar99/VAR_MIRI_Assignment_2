@@ -50,6 +50,9 @@ export function addDragControlToObjects(scene, eyeScene, camera, renderer, orbit
     const objects = [];
     objects.push(scene.getObjectByName("Teapot"));
     objects.push(eyeScene.getObjectByName("Head"));
+    objects.push(scene.getObjectByName("Torus"));
+    const cake = scene.getObjectByName("cake");
+    if (cake) objects.push(cake);
 
     const controls = new DragControls(objects, camera, renderer.domElement);
 
